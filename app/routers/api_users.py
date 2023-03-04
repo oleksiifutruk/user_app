@@ -6,8 +6,6 @@ from app.database import SessionLocal, engine
 
 router = APIRouter()
 
-models.Base.metadata.create_all(bind=engine)
-
 app = FastAPI()
 
 
@@ -34,30 +32,17 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/users/", response_model=schemas.User)
-def create_user_api(user: schemas.UserCreate, db: Session = Depends(get_db)):
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.create_user(db, user)
     return db_user
 
 
 @router.put("/users/{user_id}", response_model=schemas.User)
 def update_user(user_id: int, user: schemas.UserUpdate, db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    update_data = user.dict(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(db_user, key, value)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
-
+    user_upd = crud.up_user(user_id,user,db)
+    return user_upd
 
 @router.delete("/users/{user_id}")
-async def delete_user(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    db.delete(user)
-    db.commit()
-    return {"message": f"User with id {user_id} has been deleted."}
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    delete_us = crud.del_user(user_id,db)
+    return delete_us

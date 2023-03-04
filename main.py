@@ -1,17 +1,13 @@
 from fastapi import FastAPI
 from app.routers import api_users
-
+from app.database import engine,sql_table,sql_add_data_users
 
 app = FastAPI()
 
-
-
 @app.on_event("startup")
 async def startup():
-    pass
-
-
-
+    sql_table()
+    sql_add_data_users()
 
 @app.on_event("shutdown")
 async def shutdown():

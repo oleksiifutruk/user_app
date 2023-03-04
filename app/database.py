@@ -17,14 +17,24 @@ Base = declarative_base()
 
 
 
-
 data_folder = os.path.join(os.path.dirname(__file__), '..', 'data')
 db_sql = os.path.join(data_folder, 'db.sql')
 users_sql = os.path.join(data_folder, 'users.sql')
 
-with open(db_sql, "r") as f:
-    sql = f.read()
+def sql_table():
+    with open(db_sql, "r") as f:
+        sql_tabl = f.read()
+    with engine.connect() as connection:
+        connection.execute(sql_tabl)
 
+def sql_add_data_users():
+    with open(users_sql, "r") as f:
+        sql_add = f.read()
+    with engine.connect() as connection:
+        result = connection.execute('SELECT COUNT(*) FROM users')
+        count = result.scalar()
+        if count == 0:
+            connection.execute(sql_add)
 
 
 
